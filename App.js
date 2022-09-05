@@ -32,12 +32,12 @@ const fillFiller = ()=>{
 }
 
 const output = () =>{
-	const filename = __dirname+'/data/output/output_data2.csv';
+	const filename = __dirname+'/data/output/output_data.csv';
 	stringify(result,  (err, output) => {
 		if (err) throw err;
 		fs.writeFile(filename, output, (err) => {
 		  if (err) throw err;
-		  console.log('my.csv saved.');
+		  console.log('csv saved.');
 		});
 	  });
 }
