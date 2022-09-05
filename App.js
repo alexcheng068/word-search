@@ -2,6 +2,9 @@
 
 const { filler } = require('./data/input/input');
 const { shuffle } = require('./util');
+const { fillWords } = require('./word_search');
+
+
 const fs = require('fs'); 
 const { stringify } = require("csv-stringify");
 
@@ -11,7 +14,7 @@ const COL_NUM = 11;
 const result = [];
 
 
-const initArray = (rows) =>  {  
+const initArray = () =>  {  
 	for (var i=0;i<ROW_NUM;i++) {
 		result[i] = [];
 	}
@@ -28,22 +31,8 @@ const fillFiller = ()=>{
 	}
 }
 
-const output2 = () =>{
+const output = () =>{
 	const filename = __dirname+'/data/output/output_data2.csv';
-
-	let columns = {
-	  id: 'id',
-	  name: 'Name'
-	};
-	
-
-
-	const data = [
-		result,
-		["2"]
-	];
-
-	options = { header: true, columns: columns };
 	stringify(result,  (err, output) => {
 		if (err) throw err;
 		fs.writeFile(filename, output, (err) => {
@@ -53,6 +42,8 @@ const output2 = () =>{
 	  });
 }
 
+
 initArray();
 fillFiller();
-output2();
+fillWords(result, ROW_NUM, COL_NUM );
+output();
