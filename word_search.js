@@ -1,8 +1,8 @@
 const { words } = require('./data/input/input');
 const { shuffle } = require('./util');
 
-const WORD_NUM = 18;
-
+const WORD_NUM = 20;
+const spotsTaken = [];
 
 const getWordsArray = () => {
 	const shuffledWords = shuffle(words);
@@ -19,18 +19,54 @@ const getDirection = () => {
     return isEven ? "horizontal" : "verticle";
 }
 
+const getSpotId = (row, col) =>{
+    return `${row},${col}`;
+}
+
+const isSpotTaken = (row, col, length, direction) =>{
+    const IsTakenFound = (row, col)=> {
+        const spotId = getSpotId(row, col);
+        return spotsTaken.includes(spotId);
+    }
+
+    if (direction  === "verticle"){
+        for (let i = 0; i < length; i++ ) {
+            if(IsTakenFound(row+i, col)){
+                return true;
+            }
+        }
+    }
+
+    if (direction  === "horizontal"){
+        for (let i = 0; i < length; i++ ) {
+            if(IsTakenFound(row, col+i)){
+                return true
+            }
+        }
+    }
+
+    return false;
+}
+
+const addToTaken = (row, col) => {
+    const id = getSpotId(row, col)
+    spotsTaken.push(id)
+}
+
 const fillWords = (result, maxRow, maxCol)=>{
 	const words = getWordsArray();
 
     const fillVerticle = (word, spot)=>{
         for (let i = 0; i < word.length; i++ ) {
             result[spot.rol + i][spot.col] = word[i];
+            addToTaken(spot.rol + i, spot.col );
         }
     }
     
     const fillHorizontal = (word, spot)=>{
         for (let i = 0; i < word.length; i++ ) {
             result[spot.rol][spot.col + i] = word[i];
+            addToTaken(spot.rol, spot.col + i );
         }
     }
 
@@ -38,11 +74,18 @@ const fillWords = (result, maxRow, maxCol)=>{
         const direction = getDirection();
         let spot = {};
         let isValid = false;
+
         while (!isValid){
             spot = { rol: getRandomNumber(maxRow), col: getRandomNumber(maxCol) }
-            if (direction === "verticle" && spot.rol + word.length <= maxRow) isValid = true;
-            if (direction === "horizontal" && spot.col + word.length <= maxCol) isValid = true;
-            // TODO: check for overlap with other words
+
+            const isWithinBound = (direction === "verticle" && spot.rol + word.length <= maxRow) ||
+                                  (direction === "horizontal" && spot.col + word.length <= maxCol);
+
+            const noOverLap = !isSpotTaken(spot.rol, spot.col, word.length, direction);
+
+            
+            isValid = isWithinBound && noOverLap;
+            
         }
 
         direction  === "verticle" ? fillVerticle(word, spot) : fillHorizontal(word, spot)
